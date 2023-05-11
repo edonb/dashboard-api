@@ -41,11 +41,15 @@ fetchNews();
 setInterval(fetchNews, 600000)
 
 async function fetchWeatherData() {
-
   for (const location in locations) {
     try {
       const { lat, lon } = locations[location];
-      const response = await fetch(`${metApiUrl}?lat=${lat}&lon=${lon}`);
+      const response = await fetch(`${metApiUrl}?lat=${lat}&lon=${lon}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
       console.log(`${metApiUrl}?lat=${lat}&lon=${lon}`)
       
       if (!response.ok) {
