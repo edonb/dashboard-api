@@ -47,7 +47,8 @@ async function fetchWeatherData() {
       const response = await fetch(`${metApiUrl}?lat=${lat}&lon=${lon}`, {
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'your-app-name'
         }
       });
       console.log(`${metApiUrl}?lat=${lat}&lon=${lon}`)
