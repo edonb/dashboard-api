@@ -48,7 +48,7 @@ async function fetchWeatherData() {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'User-Agent': 'your-app-name'
+          'User-Agent': 'dashboard-app'
         }
       });
       console.log(`${metApiUrl}?lat=${lat}&lon=${lon}`)
