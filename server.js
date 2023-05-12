@@ -41,6 +41,7 @@ fetchNews();
 setInterval(fetchNews, 600000)
 
 async function fetchWeatherData() {
+  let data = [];
   for (const location in locations) {
     try {
       const { lat, lon } = locations[location];
@@ -54,7 +55,7 @@ async function fetchWeatherData() {
       console.log(`${metApiUrl}?lat=${lat}&lon=${lon}`)
       
       if (!response.ok) {
-        weatherData[location] = { temperature: 0, symbolCode: 0 };
+        data.push({ name: location, temperature: 0, symbolCode: 0 });
         console.error(`Error: received status code ${response.status}`);
         continue;
       }
@@ -65,16 +66,16 @@ async function fetchWeatherData() {
         continue;
       }
       
-      const data = await response.json();
-      const temp = data.properties.timeseries[0].data.instant.details.air_temperature;
-      const symbolCode = data.properties.timeseries[0].data.next_1_hours.summary.symbol_code;
-      weatherData[location] = { temperature: temp, symbolCode: symbolCode };
+      const jsonData = await response.json();
+      const temp = jsonData.properties.timeseries[0].data.instant.details.air_temperature;
+      const symbolCode = jsonData.properties.timeseries[0].data.next_1_hours.summary.symbol_code;
+      data.push({ name: location, temperature: temp, symbolCode: symbolCode });
     } catch (error) {
       console.error(`Error fetching weather data for ${location}: ${error}`);
     }
   }
+  weatherData = data;
 }
-
 
 async function fetchCryptoData() {
   for (const symbol of cryptoSymbols) {
@@ -86,55 +87,44 @@ async function fetchCryptoData() {
       console.error(`Error fetching data for ${symbol}: ${error.message}`);
     }
   }
-}
-
-async function fetchAllData() {
-  // Fetch weather and exchange data
-  await fetchWeatherData();
 
   try {
     const usdResponse = await fetch(`${exchangeUrl}?base=USD&symbols=NOK`);
     const eurResponse = await fetch(`${exchangeUrl}?base=EUR&symbols=NOK`);
-    exchangeData.USD = await usdResponse.json();
-    exchangeData.EUR = await eurResponse.json();
+    const usdData = await usdResponse.json();
+    const eurData = await eurResponse.json();
+    exchangeData.USD = usdData.rates.NOK;
+    exchangeData.EUR = eurData.rates.NOK;
   } catch (error) {
     console.error(`Error fetching exchange data: ${error.message}`);
   }
 }
 
-fetchAllData();
+
+fetchWeatherData();
 fetchCryptoData();
 setInterval(fetchCryptoData, 300000);
-setInterval(fetchAllData, 21600000);
+setInterval(fetchWeatherData, 21600000);
 
 
-app.get('/crypto/:symbol', (req, res) => {
-  const { symbol } = req.params;
-  const data = cryptoData[symbol];
-  if (!data) {
-    return res.status(404).json({ error: 'Symbol not found' });
-  }
-  return res.json(data);
-});
-
-app.get('/weather/:location', (req, res) => {
-  const { location } = req.params;
-  const data = weatherData[location];
-  if (data) {
-    res.json(data);
-  } else {
-    res.json(data)
-  }
+app.get('/crypto', (req, res) => {
+  const cryptoPrices = cryptoSymbols.map(symbol => {
+    const { lastPrice } = cryptoData[symbol];
+    return { symbol, price: lastPrice };
+  });
+  
+  const exchangeRates = Object.entries(exchangeData).map(([symbol, rate]) => {
+    return { symbol, price: rate };
+  });
+  
+  const responseData = [...cryptoPrices, ...exchangeRates];
+  
+  return res.json(responseData);
 });
 
 
-app.get('/exchange/:base', (req, res) => {
-  const { base } = req.params;
-  const data = exchangeData[base];
-  if (!data) {
-    return res.status(404).json({ error: 'Base currency not found' });
-  }
-  return res.json(data);
+app.get('/weather', (req, res) => {
+    res.json(weatherData);
 });
 
 app.get('/news', (req, res) => {
@@ -147,5 +137,4 @@ app.get('/news', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-
 
