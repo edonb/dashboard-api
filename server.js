@@ -11,6 +11,7 @@ app.use(cors());
 const locations = {
   oslo: { lat: 59.9139, lon: 10.7522 },
   sarpsborg: { lat: 59.2831, lon: 11.1097 },
+  koster: { lat: 58.8663, lon: 11.0076 },
   copenhagen: { lat: 55.6761, lon: 12.5683 },
   nice: { lat: 43.7102, lon: 7.2620 },
   monaco: { lat: 43.7384, lon: 7.4246 },
