@@ -105,7 +105,7 @@ async function fetchCryptoData() {
 fetchWeatherData();
 fetchCryptoData();
 setInterval(fetchCryptoData, 300000);
-setInterval(fetchWeatherData, 21600000);
+setInterval(fetchWeatherData, 1800000);
 
 
 app.get('/crypto', (req, res) => {
