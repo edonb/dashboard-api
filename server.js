@@ -16,7 +16,7 @@ const locations = {
   copenhagen: { lat: 55.6761, lon: 12.5683 },
   nice: { lat: 43.7102, lon: 7.2620 },
   monaco: { lat: 43.7384, lon: 7.4246 },
-  la: { lat:  34.0522, lon: 118.2437}
+  la: { lat: 34.0522, lon: 118.2437 }
 };
 const apiUrl = "https://api.binance.com/api/v3/ticker/24hr";
 const metApiUrl = "https://api.met.no/weatherapi/locationforecast/2.0/compact";
